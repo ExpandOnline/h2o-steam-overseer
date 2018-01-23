@@ -93,16 +93,13 @@ func findWar(path string) (string, error) {
 }
 
 func getProcessID(id int) int {
-	time.Sleep(time.Second * 5)
-	cmd := exec.Command("screen", "-ls", strconv.Itoa(id))
+	time.Sleep(time.Second * 2)
+	cmd := exec.Command("screen", "-ls")
 	var output bytes.Buffer
 	cmd.Stdout = &output
-	err := cmd.Run()
-	if err != nil {
-		return 0
-	}
+	cmd.Run()
 	cmd.Wait()
-	re := regexp.MustCompile(`(\d+).` + strconv.Itoa(id))
+	re := regexp.MustCompile(`(?m)(\d+).` + strconv.Itoa(id))
 	result := re.FindAllStringSubmatch(output.String(), -1)
 	if len(result) > 0 && len(result[0]) > 1 {
 		ID, _ := strconv.Atoi(result[0][1])
