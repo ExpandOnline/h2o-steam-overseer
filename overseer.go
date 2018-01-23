@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	ps "github.com/mitchellh/go-ps"
@@ -91,19 +92,21 @@ func findWar(path string) (string, error) {
 	return filepath.Join(path, war), nil
 }
 
-func getProcessID(id int) string {
+func getProcessID(id int) int {
+	time.Sleep(time.Second * 5)
 	cmd := exec.Command("screen", "-ls", strconv.Itoa(id))
 	var output bytes.Buffer
 	cmd.Stdout = &output
 	err := cmd.Run()
 	if err != nil {
-		return ""
+		return 0
 	}
 	cmd.Wait()
 	re := regexp.MustCompile(`(\d+).` + strconv.Itoa(id))
 	result := re.FindAllStringSubmatch(output.String(), -1)
 	if len(result) > 0 && len(result[0]) > 1 {
-		return result[0][1]
+		ID, _ := strconv.Atoi(result[0][1])
+		return ID
 	}
-	return ""
+	return 0
 }
